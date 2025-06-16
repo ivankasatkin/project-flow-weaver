@@ -6,7 +6,7 @@
 
     <groupId>io.github.ivankasatkin</groupId>
     <artifactId>project-flow-weaver</artifactId>
-    <version>1.0.0</version>
+    <version>0.1.0</version>
 
     <description>A tiny Java 8+ framework that provides an infrastructure for designing complex business flows via stateless interchangeable brokers
     </description>
