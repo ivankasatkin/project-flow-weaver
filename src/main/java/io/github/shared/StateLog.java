@@ -11,19 +11,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Objects;
-import java.util.Arrays;
+import java.time.temporal.Temporal;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
 /**
  * A thread-safe class that holds, populates and exports a sequence of arbitrary objects' states in a for of a log.
+ * <p>
+ * This means that when an object having arbitrary fields that are undergoing changes of their values, and the ain is to
+ * preserve the snapshots of the forementioned fields values alterations - {@link StateLog} is meant to scan and capture
+ * a snapshot of field's values in a form of a {@link Map}. Moreover, in case if the submitted field within an object
+ * does not represent a simple type (e.g. a custom model) - {@link StateLog} would recursively scan through fields'
+ * content towards capturing fields' nested structure and values thereof.
+ * <p>
+ * This mechanism works well together with {@link ToStateLog} annotation which is designated to be used for marking fields
+ * that are needed to be captured within a {@link StateLog} entry. In case if the {@link ToStateLog} is NOT presented within
+ * an objects' fields - {@link StateLog} will go through the whole objects' fields towards their names and values capturing.
+ * <p>
  * Uses internal class {@link Entry} to create a log entry that is appended to the log.
  * <p>
  * Exports log either as an immutable {@link Map} snapshot or as a JSON string.
@@ -256,20 +262,41 @@ public class StateLog extends BlockingReadWriteLockWrapper {
         }
 
         private static void logDiscoveredFields(List<Field> fields, Object obj, Map<String, Object> content) {
-            fields.forEach(field -> {
+            for (Field field : fields) {
                 try {
                     boolean isFieldInitiallyAccessible = false;
                     if (isFieldInitiallyAccessible == field.isAccessible()) {
                         field.setAccessible(true);
                     }
+
+
                     Object value = field.get(obj);
-                    content.put(field.getName(), copyAsObject(value));
+                    String fieldName = field.getName();
+
+                    if (value == null || isSimpleValueType(value.getClass())) {
+                        content.put(fieldName, value);
+                    } else {
+                        Map<String, Object> nestedContent = buildContent(value);
+                        content.put(fieldName, nestedContent);
+                    }
+
                     if (!isFieldInitiallyAccessible && field.isAccessible()) {
                         field.setAccessible(false);
                     }
-                } catch (Exception ignore) {
-                }
-            });
+                } catch (Exception ignore) {}
+            }
+        }
+
+        private static boolean isSimpleValueType(Class<?> clazz) {
+            return clazz.isPrimitive()
+                    || clazz.isEnum()
+                    || clazz.equals(String.class)
+                    || Number.class.isAssignableFrom(clazz)
+                    || Boolean.class.equals(clazz)
+                    || Character.class.equals(clazz)
+                    || Date.class.isAssignableFrom(clazz)
+                    || Temporal.class.isAssignableFrom(clazz);
         }
     }
+
 }
