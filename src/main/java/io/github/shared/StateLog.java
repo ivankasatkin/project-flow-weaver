@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
  * Uses internal class {@link Entry} to create a log entry that is appended to the log.
  * <p>
  * Exports log either as an immutable {@link Map} snapshot or as a JSON string.
+ * <p>
+ * Thread-safe.
+ * @since 0.1.0
  */
 public class StateLog extends BlockingReadWriteLockWrapper {
 
@@ -97,7 +100,7 @@ public class StateLog extends BlockingReadWriteLockWrapper {
      * @return a {@link StateLog} instance.
      */
     public StateLog append(InstanceNameAware instanceNameAware) {
-        invokeAppend(() -> new Entry(buildLogEntryTitle(instanceNameAware), instanceNameAware));
+        invokeAppend(() -> new Entry(buildLogEntryTitle(instanceNameAware), copyAsObject(instanceNameAware)));
         return this;
     }
 
@@ -113,7 +116,7 @@ public class StateLog extends BlockingReadWriteLockWrapper {
      * @return a {@link StateLog} instance.
      */
     public StateLog append(String title, Object content) {
-        invokeAppend(() -> new Entry(buildLogEntryTitle(title), content));
+        invokeAppend(() -> new Entry(buildLogEntryTitle(title), copyAsObject(content)));
         return this;
     }
 
@@ -268,7 +271,6 @@ public class StateLog extends BlockingReadWriteLockWrapper {
                     if (isFieldInitiallyAccessible == field.isAccessible()) {
                         field.setAccessible(true);
                     }
-
 
                     Object value = field.get(obj);
                     String fieldName = field.getName();
