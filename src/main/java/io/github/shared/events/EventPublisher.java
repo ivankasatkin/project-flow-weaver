@@ -1,4 +1,4 @@
-package io.github.shared;
+package io.github.shared.events;
 
 import java.util.EventObject;
 

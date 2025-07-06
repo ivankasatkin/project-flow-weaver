@@ -1,4 +1,6 @@
-package io.github.shared.contracts;
+package io.github.shared.events;
+
+import io.github.shared.contracts.TypeAware;
 
 import java.util.EventObject;
 

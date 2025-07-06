@@ -28,13 +28,17 @@ import java.util.stream.Collectors;
  * <p>
  * This mechanism works well together with {@link ToStateLog} annotation which is designated to be used for marking fields
  * that are needed to be captured within a {@link StateLog} entry. In case if the {@link ToStateLog} is NOT presented within
- * an objects' fields - {@link StateLog} will go through the whole objects' fields towards their names and values capturing.
+ * objects' fields - {@link StateLog} will go through the whole objects' fields towards their names and values capturing.
  * <p>
- * Uses internal class {@link Entry} to create a log entry that is appended to the log.
+ * Uses internal class {@link Entry} to create a log entry containing a deep copy of the captured fields' values
+ * that is further appended to the log.
  * <p>
  * Exports log either as an immutable {@link Map} snapshot or as a JSON string.
  * <p>
  * Thread-safe.
+ *
+ * @see Entry
+ * @see ToStateLog
  * @since 0.1.0
  */
 public class StateLog extends BlockingReadWriteLockWrapper {
@@ -63,7 +67,9 @@ public class StateLog extends BlockingReadWriteLockWrapper {
         if (stateLogEntry == null) {
             throw new StateLogIllegalArgumentException("State log entry must not be null!");
         }
-        return new StateLog(Collections.singletonList(stateLogEntry));
+        StateLog stateLog = new StateLog();
+        stateLog.withWriteLock(() -> stateLog.log.add(stateLogEntry));
+        return stateLog;
     }
 
     /**
@@ -86,7 +92,7 @@ public class StateLog extends BlockingReadWriteLockWrapper {
         if (other == null) {
             throw new StateLogIllegalArgumentException("Cannot create state log from other as the submitted state log is null!");
         }
-        return new StateLog(other.log);
+        return new StateLog(new ArrayList<>(other.log));
     }
 
     /**
@@ -100,7 +106,7 @@ public class StateLog extends BlockingReadWriteLockWrapper {
      * @return a {@link StateLog} instance.
      */
     public StateLog append(InstanceNameAware instanceNameAware) {
-        invokeAppend(() -> new Entry(buildLogEntryTitle(instanceNameAware), copyAsObject(instanceNameAware)));
+        withWriteLock(() -> log.add(new Entry(buildLogEntryTitle(instanceNameAware), copyAsObject(instanceNameAware))));
         return this;
     }
 
@@ -116,7 +122,7 @@ public class StateLog extends BlockingReadWriteLockWrapper {
      * @return a {@link StateLog} instance.
      */
     public StateLog append(String title, Object content) {
-        invokeAppend(() -> new Entry(buildLogEntryTitle(title), copyAsObject(content)));
+        withWriteLock(() -> log.add(new Entry(title, copyAsObject(content))));
         return this;
     }
 
@@ -157,6 +163,25 @@ public class StateLog extends BlockingReadWriteLockWrapper {
         ));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof StateLog)) return false;
+        StateLog stateLog = (StateLog) o;
+        return Objects.equals(log, stateLog.log);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(log);
+    }
+
+    @Override
+    public String toString() {
+        return "StateLog{" +
+                "log=" + log +
+                '}';
+    }
 
     private static Object copyAsObject(Object obj) {
         if (obj == null) {
@@ -185,10 +210,6 @@ public class StateLog extends BlockingReadWriteLockWrapper {
         return (StringUtils.isBlank(name)) ? null : (log.size() + 1) + ". " + name;
     }
 
-    private void invokeAppend(Supplier<Entry> stateLogSupplier) {
-        withWriteLock(() -> log.add(stateLogSupplier.get()));
-    }
-
 
     private StateLog() {
         super(true);
@@ -204,9 +225,13 @@ public class StateLog extends BlockingReadWriteLockWrapper {
 
 
     /**
-     * A static nested class of a {@link StateLog} that holds log entry title, timestamp and content in a form of an Object.
+     * A static nested class of a {@link StateLog} that holds log entry title, timestamp and captured field's value deep copy as a content.
      * <p>
      * Immutable.
+     *
+     * @see StateLog
+     * @see ToStateLog
+     * @since 0.1.0
      */
     public static class Entry {
 
@@ -235,10 +260,35 @@ public class StateLog extends BlockingReadWriteLockWrapper {
             return LocalDateTime.parse(timestamp, TIMESTAMP_FORMATTER);
         }
 
+        public String getTitleAndTimestampAsString() {
+            return title + " (" + timestamp + ")";
+        }
+
         public Map<String, Object> getContent() {
             return content;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Entry)) return false;
+            Entry entry = (Entry) o;
+            return Objects.equals(title, entry.title) && Objects.equals(timestamp, entry.timestamp) && Objects.equals(content, entry.content);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(title, timestamp, content);
+        }
+
+        @Override
+        public String toString() {
+            return "Entry{" +
+                    "title='" + title + '\'' +
+                    ", timestamp='" + timestamp + '\'' +
+                    ", content=" + content +
+                    '}';
+        }
 
         private static Map<String, Object> buildContent(Object obj) {
             if (obj == null) {
@@ -246,12 +296,18 @@ public class StateLog extends BlockingReadWriteLockWrapper {
             }
 
             Map<String, Object> content = new LinkedHashMap<>();
-            Class<?> currentClass = obj.getClass();
+            Class<?> currentClass = copyAsObject(obj).getClass();
 
             while (currentClass != Object.class) {
                 List<Field> fields = Arrays.asList(currentClass.getDeclaredFields());
                 List<Field> loggableFields = fields.stream()
-                        .filter(field -> field.isAnnotationPresent(ToStateLog.class))
+                        .filter(field -> {
+                                    if (field.isAnnotationPresent(ToStateLog.class)) {
+                                        return field.getAnnotation(ToStateLog.class).includeNullValue();
+                                    }
+                                    return false;
+                                }
+                        )
                         .collect(Collectors.toList());
 
                 if (loggableFields.isEmpty()) {
@@ -285,7 +341,8 @@ public class StateLog extends BlockingReadWriteLockWrapper {
                     if (!isFieldInitiallyAccessible && field.isAccessible()) {
                         field.setAccessible(false);
                     }
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
         }
 

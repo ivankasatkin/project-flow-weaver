@@ -1,6 +1,5 @@
-package io.github.shared;
+package io.github.shared.events;
 
-import io.github.shared.contracts.EventListener;
 import io.github.shared.exceptions.EventBusIllegalArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

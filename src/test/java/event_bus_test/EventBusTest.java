@@ -2,8 +2,8 @@ package event_bus_test;
 
 import event_bus_test.setup.SimpleEvent;
 import event_bus_test.setup.TimeEvent;
-import io.github.shared.EventBus;
-import io.github.shared.contracts.EventListener;
+import io.github.shared.events.EventBus;
+import io.github.shared.events.EventListener;
 import io.github.shared.exceptions.EventBusIllegalArgumentException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
