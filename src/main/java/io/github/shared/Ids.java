@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * A container for various ID's encapsulation within a single idempotent class.
  */
-public class IdHub {
+public class Ids {
 
     @ToStateLog(includeNullValue = false)
     private final String requestId;
@@ -43,12 +43,12 @@ public class IdHub {
     private final String applicationId;
 
 
-    public static IdHub create() {
-        return new IdHub(null, null,null,null,null,null,null,null,null,null,null,null,null,null);
+    public static Ids create() {
+        return new Ids(null, null,null,null,null,null,null,null,null,null,null,null,null,null);
     }
 
-    public static IdHub fromOther(IdHub other) {
-        return new IdHub(
+    public static Ids fromOther(Ids other) {
+        return new Ids(
                 other.getRequestId(),
                 other.getCorrelationId(),
                 other.getTraceId(),
@@ -66,8 +66,8 @@ public class IdHub {
                 );
     }
 
-    public static IdHub fromHttpHeaders(Map<String, String> headers) {
-        return new IdHub(
+    public static Ids fromHttpHeaders(Map<String, String> headers) {
+        return new Ids(
                 headers.get("X-Request-Id"),
                 headers.get("X-Correlation-Id"),
                 headers.get("X-Trace-Id"),
@@ -87,116 +87,116 @@ public class IdHub {
 
 
 
-    public IdHub withRequestId() {
+    public Ids withRequestId() {
         return withRequestId(UUID.randomUUID().toString());
     }
 
-    public IdHub withRequestId(final String requestId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withRequestId(final String requestId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withCorrelationId() {
+    public Ids withCorrelationId() {
         return withCorrelationId(UUID.randomUUID().toString());
     }
 
-    public IdHub withCorrelationId(final String correlationId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withCorrelationId(final String correlationId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withTraceId() {
+    public Ids withTraceId() {
         return withTraceId(UUID.randomUUID().toString());
     }
 
-    public IdHub withTraceId(final String traceId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withTraceId(final String traceId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withSpanId() {
+    public Ids withSpanId() {
         return withSpanId(UUID.randomUUID().toString());
     }
 
-    public IdHub withSpanId(final String spanId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withSpanId(final String spanId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withTransactionId() {
+    public Ids withTransactionId() {
         return withTransactionId(UUID.randomUUID().toString());
     }
 
-    public IdHub withTransactionId(final String transactionId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withTransactionId(final String transactionId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withUserId() {
+    public Ids withUserId() {
         return withUserId(UUID.randomUUID().toString());
     }
 
-    public IdHub withUserId(final String userId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withUserId(final String userId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withTenantId() {
+    public Ids withTenantId() {
         return withTenantId(UUID.randomUUID().toString());
     }
 
-    public IdHub withTenantId(final String tenantId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withTenantId(final String tenantId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withOperationId() {
+    public Ids withOperationId() {
         return withOperationId(UUID.randomUUID().toString());
     }
 
-    public IdHub withOperationId(final String operationId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withOperationId(final String operationId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withParentId() {
+    public Ids withParentId() {
         return withParentId(UUID.randomUUID().toString());
     }
 
-    public IdHub withParentId(final String parentId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withParentId(final String parentId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withMessageId() {
+    public Ids withMessageId() {
         return withMessageId(UUID.randomUUID().toString());
     }
 
-    public IdHub withMessageId(final String messageId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withMessageId(final String messageId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withEventId() {
+    public Ids withEventId() {
         return withEventId(UUID.randomUUID().toString());
     }
 
-    public IdHub withEventId(final String eventId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withEventId(final String eventId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withClientId() {
+    public Ids withClientId() {
         return withClientId(UUID.randomUUID().toString());
     }
 
-    public IdHub withClientId(final String clientId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withClientId(final String clientId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withDeviceId() {
+    public Ids withDeviceId() {
         return withDeviceId(UUID.randomUUID().toString());
     }
 
-    public IdHub withDeviceId(final String deviceId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withDeviceId(final String deviceId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
-    public IdHub withApplicationId() {
+    public Ids withApplicationId() {
         return withApplicationId(UUID.randomUUID().toString());
     }
 
-    public IdHub withApplicationId(final String applicationId) {
-        return new IdHub(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
+    public Ids withApplicationId(final String applicationId) {
+        return new Ids(requestId, correlationId, traceId, spanId, transactionId, userId, tenantId, operationId, parentId, messageId, eventId, clientId, deviceId, applicationId);
     }
 
     public String getRequestId() {
@@ -259,8 +259,8 @@ public class IdHub {
         toMap().forEach((key, value) -> MDC.put(key, value.toString()));
     }
 
-    public IdHub fromMDC() {
-        return new IdHub(
+    public Ids fromMDC() {
+        return new Ids(
                 MDC.get("requestId"),
                 MDC.get("correlationId"),
                 MDC.get("traceId"),
@@ -323,9 +323,9 @@ public class IdHub {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof IdHub)) return false;
-        IdHub idHub = (IdHub) o;
-        return Objects.equals(requestId, idHub.requestId) && Objects.equals(correlationId, idHub.correlationId) && Objects.equals(traceId, idHub.traceId) && Objects.equals(spanId, idHub.spanId) && Objects.equals(transactionId, idHub.transactionId) && Objects.equals(userId, idHub.userId) && Objects.equals(tenantId, idHub.tenantId) && Objects.equals(operationId, idHub.operationId) && Objects.equals(parentId, idHub.parentId) && Objects.equals(messageId, idHub.messageId) && Objects.equals(eventId, idHub.eventId) && Objects.equals(clientId, idHub.clientId) && Objects.equals(deviceId, idHub.deviceId) && Objects.equals(applicationId, idHub.applicationId);
+        if (!(o instanceof Ids)) return false;
+        Ids ids = (Ids) o;
+        return Objects.equals(requestId, ids.requestId) && Objects.equals(correlationId, ids.correlationId) && Objects.equals(traceId, ids.traceId) && Objects.equals(spanId, ids.spanId) && Objects.equals(transactionId, ids.transactionId) && Objects.equals(userId, ids.userId) && Objects.equals(tenantId, ids.tenantId) && Objects.equals(operationId, ids.operationId) && Objects.equals(parentId, ids.parentId) && Objects.equals(messageId, ids.messageId) && Objects.equals(eventId, ids.eventId) && Objects.equals(clientId, ids.clientId) && Objects.equals(deviceId, ids.deviceId) && Objects.equals(applicationId, ids.applicationId);
     }
 
     @Override
@@ -339,7 +339,7 @@ public class IdHub {
     }
 
 
-    private IdHub(
+    private Ids(
             String requestId,
             String correlationId,
             String traceId,
