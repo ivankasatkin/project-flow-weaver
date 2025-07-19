@@ -1,6 +1,5 @@
 package io.github.shared;
 
-import io.github.shared.annotations.ToStateLog;
 import org.slf4j.MDC;
 
 import java.util.HashMap;
@@ -9,44 +8,54 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * A container for various ID's encapsulation within a single idempotent class.
+ * A container for various ID's encapsulation within a single class.
  */
 public class Ids {
 
-    @ToStateLog(includeNullValue = false)
+
     private final String requestId;
-    @ToStateLog(includeNullValue = false)
+
     private final String correlationId;
-    @ToStateLog(includeNullValue = false)
+
     private final String traceId;
-    @ToStateLog(includeNullValue = false)
+
     private final String spanId;
-    @ToStateLog(includeNullValue = false)
+
     private final String transactionId;
-    @ToStateLog(includeNullValue = false)
+
     private final String userId;
-    @ToStateLog(includeNullValue = false)
+
     private final String tenantId;
-    @ToStateLog(includeNullValue = false)
+
     private final String operationId;
-    @ToStateLog(includeNullValue = false)
+
     private final String parentId;
-    @ToStateLog(includeNullValue = false)
+
     private final String messageId;
-    @ToStateLog(includeNullValue = false)
+
     private final String eventId;
-    @ToStateLog(includeNullValue = false)
+
     private final String clientId;
-    @ToStateLog(includeNullValue = false)
+
     private final String deviceId;
-    @ToStateLog(includeNullValue = false)
+
     private final String applicationId;
 
-
+    /**
+     * Creates an empty instance of {@link Ids}.
+     *
+     * @return a new instance with all fields set to null.
+     */
     public static Ids create() {
         return new Ids(null, null,null,null,null,null,null,null,null,null,null,null,null,null);
     }
 
+    /**
+     * Creates an instance of {@link Ids} with from other {@link Ids} instance.
+     *
+     * @param other the other instance to copy from.
+     * @return a new instance having values as found in the other instance.
+     */
     public static Ids fromOther(Ids other) {
         return new Ids(
                 other.getRequestId(),
@@ -66,6 +75,15 @@ public class Ids {
                 );
     }
 
+    /**
+     * Extracts IDs from the provided map of HTTP headers.
+     * <p>
+     * Looks up for the {@code X} - prefixed headers and sets the corresponding {@link Ids} values (e.g. 'X-Request-Id' header value would be available from {@link Ids#getRequestId()}).
+     *
+     * @param headers the map of HTTP headers.
+     * @return a new instance of {@link Ids} populated with the extracted headers.
+     *
+     */
     public static Ids fromHttpHeaders(Map<String, String> headers) {
         return new Ids(
                 headers.get("X-Request-Id"),
@@ -255,10 +273,19 @@ public class Ids {
         return applicationId;
     }
 
+    /**
+     * Injects current IDs' values into a {@link MDC} context.
+     *
+     */
     public void injectToMDC() {
         toMap().forEach((key, value) -> MDC.put(key, value.toString()));
     }
 
+    /**
+     * Constructs an {@link Ids} instance from the {@link MDC} context.
+     *
+     * @return new instance of {@link Ids} composed of the corresponding {@link MDC} context.
+     */
     public Ids fromMDC() {
         return new Ids(
                 MDC.get("requestId"),
@@ -278,6 +305,11 @@ public class Ids {
         );
     }
 
+    /**
+     * Constructs a map of {@link Ids} values.
+     *
+     * @return a map containing the {@link Ids} values.
+     */
     public Map<String, Object> toMap() {
         Map<String, Object> idsMap = new HashMap<>();
 
@@ -299,6 +331,14 @@ public class Ids {
         return idsMap;
     }
 
+    /**
+     * Converts the current {@link Ids} instance to a Http headers {@link Map} representation.
+     * <p>
+     * Constricts headers under a key having {@code X} prefix (e.g. 'X-Request-Id') from {@link Ids#getRequestId()}.
+     *
+     * @return a map containing the Http headers representation of the {@link Ids} values.
+     *
+     */
     public Map<String, String> toHttpHeaders() {
         Map<String, String> headers = new HashMap<>();
 

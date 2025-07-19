@@ -240,6 +240,10 @@ public class Navigator<E> extends BlockingReadWriteLockWrapper {
         return list.size();
     }
 
+    public List<E> getListSnapshot() {
+        return withReadLock(() -> new ArrayList<>(list));
+    }
+
     public boolean isLast() {
         return withReadLock(() -> cursor == list.size() - 1);
     }
